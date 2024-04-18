@@ -3,11 +3,37 @@
   "version": "1.0.0",
   "description": "Deploy a back end application using Render",
   "main": "app.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p $PORT",
+    "lint": "next lint",
+    "lint:fix": "next lint -- --fix",
+    "format": "npx prettier --write .",
+    "format:check": "npx prettier --check src"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
-	"pg": "^8.5.1"
+    "react": "18.2.0",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.9",
+    "@mui/material": "^5.11.9",
+    "formik": "^2.2.9",
+    "jwt-decode": "^4.0.0",
+    "next": "^13.5.4",
+    "react-content-loader": "^6.2.1",
+    "react-dom": "18.2.0",
+    "react-toastify": "^9.1.2",
+    "pg": "^8.5.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
