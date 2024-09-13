@@ -21,9 +21,12 @@ async function getRandomActivity(next) {
       const data = await response.json();
       return data.activity;
     } else {
+      console.log('response from bored api not ok: ', response)
       return null;
     }
   } catch (error) {
+    console.log('error to follow')
+    console.log(`there's an error: ${error}`)
     next(error)
     // return null;
   }
@@ -71,6 +74,7 @@ app.get('/', async (req, res) => {
 });
 
 app.use((err, req, res) => {
+  console.log('in error handler')
   let errStatus = err.status || 500
   let errMessage = err.message || 'unknown error'
   res.status(errStatus).send(errMessage)
