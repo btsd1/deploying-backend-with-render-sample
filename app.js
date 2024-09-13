@@ -14,7 +14,7 @@ const pool = new Pool({
 // Bored API base URL
 const BORED_API_BASE_URL = 'https://www.boredapi.com/api/';
 
-async function getRandomActivity() {
+async function getRandomActivity(next) {
   try {
     const response = await fetch(BORED_API_BASE_URL + 'activity');
     if (response.ok) {
@@ -24,14 +24,22 @@ async function getRandomActivity() {
       return null;
     }
   } catch (error) {
-    return null;
+    next(error)
+    // return null;
   }
 }
 
-app.get('/insert_activity', async (req, res) => {
+app.use((req, res, next) => {
+  console.log('first log test')
+
+  console.log('path', req.path)
+  next()
+})
+
+app.get('/insert_activity', async (req, res, next) => {
   try {
     const client = await pool.connect();
-    const activityName = await getRandomActivity();
+    const activityName = await getRandomActivity(next);
 
     if (activityName) {
       await client.query('INSERT INTO my_activities (activity) VALUES ($1)', [activityName]);
@@ -61,6 +69,12 @@ app.get('/', async (req, res) => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 });
+
+app.use((err, req, res) => {
+  let errStatus = err.status || 500
+  let errMessage = err.message || 'unknown error'
+  res.status(errStatus).send(errMessage)
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
