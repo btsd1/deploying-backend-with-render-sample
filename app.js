@@ -12,16 +12,39 @@ const pool = new Pool({
 });
 
 // Bored API base URL
-const BORED_API_BASE_URL = 'https://www.boredapi.com/api/';
+const POKE_API_BASE_URL = 'https://pokeapi.co/api/v2/pokemon/';
 
 async function getRandomActivity(next) {
   try {
-    const response = await fetch(BORED_API_BASE_URL + 'activity');
+    const response = await fetch(POKE_API_BASE_URL + 'activity');
     if (response.ok) {
       const data = await response.json();
       return data.activity;
     } else {
-      console.log('response from bored api not ok: ', response)
+      console.log('response from bored api not ok: ', JSON.stringify(response))
+      return null;
+    }
+  } catch (error) {
+    console.log('error to follow')
+    console.log(`there's an error: ${error}`)
+    next(error)
+    // return null;
+  }
+}
+
+async function getPokemonByName(pokemon_name, next) {
+  try {
+    const response = await fetch(POKE_API_BASE_URL + pokemon_name)
+    if (response.ok) {
+      const pokemon = await response.json();
+      const pokemonData = {
+        name: pokemon.name,
+        height: pokemon.height,
+        weight: pokemon.weight
+      }
+      return pokemonData;
+    } else {
+      console.log('some issue with response', JSON.stringify(response))
       return null;
     }
   } catch (error) {
@@ -39,6 +62,21 @@ app.use((req, res, next) => {
   next()
 })
 
+app.get('/:pokemon_name', async (req, res, next) => {
+  try {
+    const client = pool.connect();
+    const pokemon = await getPokemonByName(req.params.pokemon_name)
+    if (pokemon) {
+      await client.query('INSERT INTO my_activities (activity, height, weight) VALUES ($1, $2, $3)', [pokemon.name, pokemon.height, pokemon.weight]);
+      client.release();
+      res.status(201).send('inserted pokemon ', pokemon.name)
+    } else {
+      res.status(400).send('some error')
+    }
+  } catch (error) {
+    next(error)
+  }
+})
 app.get('/insert_activity', async (req, res, next) => {
   try {
     const client = await pool.connect();
