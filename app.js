@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 
 app.get('/:pokemon_name', async (req, res, next) => {
   try {
-    const client = pool.connect();
+    const client = await pool.connect();
     const pokemon = await getPokemonByName(req.params.pokemon_name)
     if (pokemon) {
       await client.query('INSERT INTO my_activities (activity, height, weight) VALUES ($1, $2, $3);', [pokemon.name, pokemon.height, pokemon.weight]);
