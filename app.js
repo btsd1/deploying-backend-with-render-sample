@@ -56,8 +56,6 @@ async function getPokemonByName(pokemon_name, next) {
 }
 
 app.use((req, res, next) => {
-  console.log('first log test')
-
   console.log('path', req.path)
   next()
 })
@@ -67,7 +65,7 @@ app.get('/:pokemon_name', async (req, res, next) => {
     const client = pool.connect();
     const pokemon = await getPokemonByName(req.params.pokemon_name)
     if (pokemon) {
-      await client.query('INSERT INTO my_activities (activity, height, weight) VALUES ($1, $2, $3)', [pokemon.name, pokemon.height, pokemon.weight]);
+      await client.query('INSERT INTO my_activities (activity, height, weight) VALUES ($1, $2, $3);', [pokemon.name, pokemon.height, pokemon.weight]);
       client.release();
       res.status(201).send('inserted pokemon ', pokemon.name)
     } else {
